@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Lab - Reactor Edition</title>
+<style>
+    :root { 
+        --accent: #00ff66; /* Cor Do Site */
+        --bg: #050505; 
+        --sidebar: #0a110d; 
+        --danger: #ff3c00; 
+    }
+    body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #eee; display:flex; height:100vh; overflow:hidden; user-select: none; }
+    
+    #sidebar { width:320px; background: var(--sidebar); border-right:1px solid #1a3324; display:flex; flex-direction:column; z-index:100; }
+    #search-box { padding:15px; background: #0d1a12; border-bottom: 1px solid #1a3324; }
+    #search { width:90%; padding:10px; border-radius:6px; border:1px solid #1a3324; background:#050505; color:white; outline:none; }
+    .scroll-area { flex:1; overflow-y:auto; padding:15px; scrollbar-width: thin; }
+    .family-name { font-size:10px; color: #4a7a5d; text-transform:uppercase; letter-spacing:1px; margin:15px 0 5px; font-weight:bold; }
+    .element { background:#0a1510; padding:6px; margin:2px; display:inline-block; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold; min-width:35px; text-align:center; border:1px solid #1a3324; transition: 0.1s; }
+    .element:hover { border-color: var(--accent); color: var(--accent); }
+
+    #tools { padding:15px; background:#080d0a; border-top:1px solid #1a3324; }
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom:8px; }
+    label { font-size:9px; color:#4a7a5d; display:block; margin-bottom:2px; }
+    input, select { width:100%; padding:5px; background:#050505; border:1px solid #1a3324; color:var(--accent); border-radius:4px; font-size:11px; outline: none;}
+    .btn-toggle { flex:1; padding:10px; border:1px solid #1a3324; border-radius:4px; cursor:pointer; background:#050505; color:#333; font-size:14px; transition: 0.2s; }
+    .btn-toggle.active { color: var(--accent); border-color: var(--accent); background: rgba(0,255,102,0.1); }
+
+    #workspace { flex:1; position:relative; overflow:hidden; background:#050505; }
+    #press-box { position: absolute; inset: 20px; border: 4px solid rgba(0, 255, 102, 0.1); background: rgba(0, 255, 102, 0.02); border-radius: 10px; pointer-events: none; z-index: 1; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); transform-origin: center center; }
+    #temp-layer, #rad-layer { position:absolute; inset:0; pointer-events:none; z-index:2; transition: background-color 0.5s; }
+    #elec-canvas { position:absolute; top:0; left:0; pointer-events:none; z-index:3; }
+
+    #mission-ui { position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.8); padding:15px; border-radius:8px; border-left:4px solid var(--accent); z-index:20; pointer-events:none;}
+    #catalyst-display { position:absolute; bottom:20px; left:20px; background:rgba(0,0,0,0.8); padding:10px 15px; border-radius:8px; border-left:4px solid var(--accent); color:white; font-weight:bold; z-index:20; display:none; }
+    #warning-ui { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:var(--danger); color:white; padding:8px 20px; border-radius:20px; font-weight:bold; display:none; z-index:200; }
+
+    /* Posição da lâmpada */
+    #bulb { position:absolute; top:20px; right:20px; width:45px; height:45px; background:#0a1510; border:1px solid #1a3324; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:100; font-size: 20px; padding:0; line-height:1; }
+    #bulb.glow { background: var(--accent); box-shadow: 0 0 25px var(--accent); color:#000; }
+    #hint-box { position:absolute; top:75px; right:20px; width:220px; background:rgba(5,10,7,0.95); padding:15px; border-radius:8px; border:1px solid #1a3324; display:none; z-index:100; font-size:12px; backdrop-filter: blur(5px); color: #ccc; }
+    #congrats-modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #050505; border: 2px solid var(--accent); padding: 40px; border-radius: 20px; text-align: center; display: none; z-index: 1000; box-shadow: 0 0 30px rgba(0,255,102,0.2); }
+
+    .particle { 
+        position:absolute; min-width:50px; height:50px; border-radius:50%; background:#0a1510; border:2px solid #1a3324;
+        display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:move; z-index:50;
+        transform: translate(-50%, -50%); transition: transform 0.1s, border-color 0.2s;
+    }
+    .particle.dragging { transform: translate(-50%, -50%) scale(1.15); border-color: var(--accent); z-index: 1000; } 
+    .molecule { border-radius: 12px; padding: 0 12px; border-color: var(--accent); background: #051a0f; }
+    .electrified { animation: tremble 0.1s infinite; border-color: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    
+    @keyframes tremble {
+        0% { margin-left: 0px; margin-top: 0px; }
+        25% { margin-left: 2px; margin-top: -1px; }
+        50% { margin-left: -1px; margin-top: 2px; }
+        75% { margin-left: -2px; margin-top: -2px; }
+        100% { margin-left: 0px; margin-top: 0px; }
+    }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+    <div id="search-box"><input id="search" placeholder="Procurar elemento..."></div>
+    <div class="scroll-area" id="menu"></div>
+    <div id="tools">
+        <div class="tool-grid">
+            <div><label>TEMP. (°C)</label><input type="number" id="t-env" value="25" oninput="updateEnv()"></div>
+            <div><label>PRESSÃO (atm)</label><input type="number" id="p-env" value="1" oninput="updateEnv()"></div>
+        </div>
+        <label>CATALISADOR</label>
+        <select id="c-env" onchange="updateEnv()" style="margin-bottom:8px;">
+            <option value="">Nenhum</option>
+            <option value="Fe">Ferro (Fe)</option>
+            <option value="Pt">Platina (Pt)</option>
+            <option value="Ni">Níquel (Ni)</option>
+        </select>
+        <div style="display:flex; gap:5px;">
+            <button class="btn-toggle" id="btn-elec" onclick="toggleBtn(this)">⚡ Eletricidade</button>
+            <button class="btn-toggle" id="btn-rad" onclick="toggleBtn(this)">☢️ Radiação</button>
+        </div>
+    </div>
+</div>
+
+<div id="workspace">
+    <div id="press-box"></div>
+    <div id="temp-layer"></div>
+    <div id="rad-layer"></div>
+    <canvas id="elec-canvas"></canvas>
+    <div id="mission-ui">OBJETIVO:<br><strong id="goal-name" style="font-size:22px; color:var(--accent);">H2O</strong></div>
+    <div id="catalyst-display">Catalisador: Nenhum</div>
+    <div id="warning-ui">⚠️ TERMÓLISE ATIVA (>1000°C)</div>
+    <div id="bulb" onclick="toggleHint()">💡</div>
+    <div id="hint-box"><p id="hint-text"></p></div>
+    <div id="congrats-modal">
+        <h2 style="color:var(--accent); margin-top:0;">🎉 MISSÃO CUMPRIDA!</h2>
+        <p>Sintetizou: <strong id="success-formula" style="color:white; font-size: 1.2em;"></strong></p>
+        <button onclick="nextChallenge()" style="background:var(--accent); border:none; padding:12px 30px; cursor:pointer; font-weight:bold; border-radius: 5px; margin-top: 15px; color: #000;">PRÓXIMO</button>
+    </div>
+</div>
+
+<script>
+    // Lista de elementos organizada por famílias, para facilitar a navegação e pesquisa.
+const ELEMENTS_LIST = {
+    "Não Metais": ["H", "He", "B", "C", "N", "O", "F", "Ne", "P", "S", "Cl", "Ar", "Se", "Br", "Kr", "I", "Xe", "At", "Rn", "Ts", "Og"],
+    "Metais Alcalinos": ["Li", "Na", "K", "Rb", "Cs", "Fr"],
+    "Alcalino-Terrosos": ["Be", "Mg", "Ca", "Sr", "Ba", "Ra"],
+    "Metais de Transição": ["Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"],
+    "Pós-Transição": ["Al", "Ga", "In", "Sn", "Tl", "Pb", "Bi", "Po", "Nh", "Fl", "Mc", "Lv"],
+    "Semimetais": ["Si", "Ge", "As", "Sb", "Te"],
+    "Lantanídeos": ["La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu"],
+    "Actinídeos": ["Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"]
+};
+ // Lógica de missões: cada composto tem um requisito específico para ser sintetizado, incentivando o jogador a experimentar diferentes condições.
+const MISSION_LOGIC = {
+    "H2O": { hint: "Água: Oxigénio e Hidrogénio. Use ⚡ ou Temp > 100°C.", check: (e) => e.elec || e.t >= 100 },
+    "CO2": { hint: "Dióxido de Carbono: Combustão de C. Requer Temp > 250°C.", check: (e) => e.t >= 250 },
+    "NH3": { hint: "Amónia: N e H. Requer Pressão > 10atm e Catalisador de Ferro (Fe).", check: (e) => e.p >= 10 && e.cat === "Fe" },
+    "CH4": { hint: "Metano: C e H. Requer Temp > 150°C e Catalisador de Níquel (Ni).", check: (e) => e.t >= 150 && e.cat === "Ni" },
+    "HCl": { hint: "Ácido Clorídrico: Cloro e Hidrogénio. Reage sob Radiação (☢️).", check: (e) => e.rad },
+    "O3": { hint: "Ozônio: Oxigênio puro sob descarga elétrica (⚡).", check: (e) => e.elec },
+    "NO2": { hint: "Dióxido de Nitrogênio: N e O. Requer Temp > 500°C.", check: (e) => e.t >= 500 },
+    "SO2": { hint: "Dióxido de Enxofre: S e O. Requer Temp > 300°C.", check: (e) => e.t >= 300 },
+    "SO3": { hint: "Trióxido de Enxofre: S e O. Requer Platina (Pt) como catalisador.", check: (e) => e.cat === "Pt" },
+    "H2O2": { hint: "Peróxido de Hidrogênio: H e O. Requer Pressão > 20atm.", check: (e) => e.p >= 20 },
+    "NaCl": { hint: "Sal de Cozinha: Na e Cl. Reação espontânea (Temp > 25°C).", check: (e) => e.t >= 25 },
+    "MgO": { hint: "Óxido de Magnésio: Mg e O. Requer Temp > 600°C (Combustão).", check: (e) => e.t >= 600 },
+    "CaO": { hint: "Cal Viva: Ca e O. Requer Temp > 800°C.", check: (e) => e.t >= 800 },
+    "Fe2O3": { hint: "Ferrugem: Ferro e Oxigênio. Requer Temp > 50°C e Radiação (☢️) aceleradora.", check: (e) => e.t >= 50 && e.rad },
+    "H2SO4": { hint: "Ácido Sulfúrico: H, S e O. Requer Pressão > 15atm e Platina (Pt).", check: (e) => e.p >= 15 && e.cat === "Pt" },
+    "HNO3": { hint: "Ácido Nítrico: H, N e O. Requer Platina (Pt) e Temp > 200°C.", check: (e) => e.cat === "Pt" && e.t >= 200 },
+    "C2H2": { hint: "Acetileno: C e H. Requer Arco Elétrico (⚡).", check: (e) => e.elec },
+    "C6H6": { hint: "Benzeno: C e H. Requer Pressão > 40atm e Temp > 400°C.", check: (e) => e.p >= 40 && e.t >= 400 },
+    "CH3OH": { hint: "Metanol: C, H e O. Requer Pressão > 50atm e Níquel (Ni).", check: (e) => e.p >= 50 && e.cat === "Ni" },
+    "C2H5OH": { hint: "Etanol: C, H e O. Requer Temp > 300°C e Pressão > 60atm.", check: (e) => e.t >= 300 && e.p >= 60 },
+    "HCN": { hint: "Cianeto de Hidrogênio: H, C e N. Requer Platina (Pt) e Temp > 1000°C.", check: (e) => e.cat === "Pt" && e.t >= 1000 },
+    "PCl3": { hint: "Tricloreto de Fósforo: P e Cl. Requer Radiação (☢️).", check: (e) => e.rad },
+    "SF6": { hint: "Hexafluoreto de Enxofre: S e F. Requer Pressão > 30atm.", check: (e) => e.p >= 30 },
+    "UF6": { hint: "Hexafluoreto de Urânio: U e F. Requer Radiação (☢️) constante.", check: (e) => e.rad },
+    "Li2O": { hint: "Óxido de Lítio: Li e O. Requer Temp > 450°C.", check: (e) => e.t >= 450 },
+    "K2O": { hint: "Óxido de Potássio: K e O. Requer Temp > 350°C.", check: (e) => e.t >= 350 },
+    "CaCO3": { hint: "Calcário: Ca, C e O. Requer Pressão > 25atm.", check: (e) => e.p >= 25 },
+    "SiO2": { hint: "Sílica (Areia): Si e O. Requer Temp > 1200°C.", check: (e) => e.t >= 1200 },
+    "CS2": { hint: "Dissulfeto de Carbono: C e S. Requer Temp > 900°C.", check: (e) => e.t >= 900 },
+    "NI3": { hint: "Triiodeto de Nitrogênio: N e I. Requer Temp < 0°C (Estabilidade).", check: (e) => e.t <= 0 },
+    "HeH": { hint: "Hidreto de Hélio: He e H. Requer Radiação (☢️) extrema.", check: (e) => e.rad },
+    "Al2O3": { hint: "Alumina: Al e O. Requer Eletricidade (⚡) e Temp > 900°C.", check: (e) => e.elec && e.t >= 900 },
+    "AgCl": { hint: "Cloreto de Prata: Ag e Cl. Reage sob Radiação (☢️).", check: (e) => e.rad },
+    "CO": { hint: "Monóxido de Carbono: C e O. Requer Temp > 700°C e Pressão < 1atm.", check: (e) => e.t >= 700 && e.p <= 1 },
+    "CuSO4": { hint: "Sulfato de Cobre: Cu, S e O. Requer Pressão > 10atm e Temp > 150°C.", check: (e) => e.p >= 10 && e.t >= 150 }
+};
+// Variáveis globais e configuração inicial
+let currentGoal = "H2O";
+let zIndexCounter = 100;
+const workspace = document.getElementById("workspace");
+const canvas = document.getElementById("elec-canvas");
+const ctx = canvas.getContext("2d");
+
+const resizeObserver = new ResizeObserver(() => {
+    canvas.width = workspace.clientWidth;
+    canvas.height = workspace.clientHeight;
+});
+resizeObserver.observe(workspace);
+
+function updateEnv() {
+    const t = parseFloat(document.getElementById("t-env").value) || 0;
+    const p = parseFloat(document.getElementById("p-env").value) || 1;
+    const cat = document.getElementById("c-env").value;
+    const elec = document.getElementById("btn-elec").classList.contains("active");
+    const rad = document.getElementById("btn-rad").classList.contains("active");
+
+    const catDisplay = document.getElementById("catalyst-display");
+    if (cat !== "") {
+        catDisplay.innerText = "Catalisador Ativo: " + cat;
+        catDisplay.style.display = "block";
+    } else {
+        catDisplay.style.display = "none";
+    }
+
+    const pressBox = document.getElementById("press-box");
+    const scale = Math.max(0.3, 1 - (p * 0.015)); 
+    pressBox.style.transform = `scale(${scale})`;
+
+    // Mesa principal ajustada para vermelho ao aumentar a temperatura.
+    const tempLayer = document.getElementById("temp-layer");
+    tempLayer.style.backgroundColor = `rgba(255, 0, 0, ${Math.min(t / 1000, 0.5)})`;
+
+    // Mesa principal ajustada para roxo ao ativar a radiação.
+    const radLayer = document.getElementById("rad-layer");
+    radLayer.style.backgroundColor = rad ? "rgba(128, 0, 128, 0.3)" : "transparent";
+
+    document.querySelectorAll(".particle").forEach(p => {
+        if (elec) p.classList.add("electrified");
+        else p.classList.remove("electrified");
+    });
+// Ativa a termólise se a temperatura ultrapassar 1000°C, transformando moléculas em átomos.
+    if (t > 999) {
+        document.getElementById("warning-ui").style.display = "block";
+        document.querySelectorAll(".molecule").forEach(m => {
+            const formula = m.dataset.formula;
+            const components = parseFormula(formula);
+            const rect = m.getBoundingClientRect();
+            const wRect = workspace.getBoundingClientRect();
+            m.remove();
+            for (let atom in components) {
+                for (let i = 0; i < components[atom]; i++) {
+                    spawn(atom, rect.left - wRect.left + (Math.random() * 40 - 20), rect.top - wRect.top + (Math.random() * 40 - 20));
+                }
+            }
+        });
+    } else {
+        document.getElementById("warning-ui").style.display = "none";
+    }
+}
+// Animação de eletricidade
+function animateElectricity() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (document.getElementById("btn-elec").classList.contains("active")) {
+        const parts = Array.from(document.querySelectorAll(".particle"));
+        const wRect = workspace.getBoundingClientRect();
+        for (let i = 0; i < parts.length; i++) {
+            for (let j = i + 1; j < parts.length; j++) {
+                const r1 = parts[i].getBoundingClientRect();
+                const r2 = parts[j].getBoundingClientRect();
+                const x1 = r1.left - wRect.left + r1.width / 2;
+                const y1 = r1.top - wRect.top + r1.height / 2;
+                const x2 = r2.left - wRect.left + r2.width / 2;
+                const y2 = r2.top - wRect.top + r2.height / 2;
+                const dist = Math.hypot(x2 - x1, y2 - y1);
+                if (dist < 250 && Math.random() > 0.4) drawSpark(x1, y1, x2, y2);
+            }
+        }
+    }
+    requestAnimationFrame(animateElectricity);
+}
+
+function drawSpark(x1, y1, x2, y2) {
+    ctx.beginPath(); ctx.strokeStyle = "#00ff66"; ctx.lineWidth = 2; ctx.moveTo(x1, y1);
+    const steps = 6;
+    for (let i = 1; i < steps; i++) {
+        const tx = x1 + (x2 - x1) * (i / steps);
+        const ty = y1 + (y2 - y1) * (i / steps);
+        ctx.lineTo(tx + (Math.random() - 0.5) * 20, ty + (Math.random() - 0.5) * 20);
+    }
+    ctx.lineTo(x2, y2); ctx.stroke();
+}
+
+function toggleBtn(btn) { btn.classList.toggle('active'); updateEnv(); }
+function toggleHint() {
+    const box = document.getElementById("hint-box");
+    box.style.display = box.style.display === "block" ? "none" : "block";
+    document.getElementById("hint-text").innerText = MISSION_LOGIC[currentGoal].hint;
+    document.getElementById("bulb").classList.remove("glow");
+}
+// Funções de parsing e manipulação de fórmulas químicas
+function parseFormula(f) {
+    let m = {}; let regex = /([A-Z][a-z]*)(\d*)/g; let match;
+    while ((match = regex.exec(f)) !== null) { m[match[1]] = (m[match[1]] || 0) + (parseInt(match[2]) || 1); }
+    return m;
+}
+
+function stringifyFormula(m) { return Object.keys(m).sort().map(k => k + (m[k] > 1 ? m[k] : "")).join(""); }
+// Função para Definir o spawn de partículas no workspace
+function spawn(formula, x, y) {
+    const p = document.createElement("div");
+    const isMol = formula.length > 2 || /\d/.test(formula);
+    p.className = `particle ${isMol ? 'molecule' : ''}`;
+    if(document.getElementById("btn-elec").classList.contains("active")) p.classList.add("electrified");
+    p.innerHTML = formula.replace(/\d+/g, '<sub>$&</sub>');
+    p.dataset.formula = formula;
+    const rect = workspace.getBoundingClientRect();
+    p.style.left = (x || rect.width/2 + (Math.random()*150 - 75)) + "px";
+    p.style.top = (y || rect.height/2 + (Math.random()*150 - 75)) + "px";
+    // Lógica de arrastar e soltar para as partículas
+    p.onmousedown = (e) => {
+        p.classList.add("dragging");
+        let offsetX = e.clientX - p.offsetLeft;
+        let offsetY = e.clientY - p.offsetTop;
+        p.style.zIndex = zIndexCounter++;
+        const move = (ev) => { p.style.left = (ev.clientX - offsetX) + "px"; p.style.top = (ev.clientY - offsetY) + "px"; };
+        document.onmousemove = move;
+        document.onmouseup = () => {
+            p.classList.remove("dragging");
+            document.onmousemove = null;
+            checkCollision(p);
+        };
+    };
+    p.addEventListener('dblclick', () => p.remove());
+    workspace.appendChild(p);
+}
+// Função para verificar colisões entre partículas e tentar sintetizar novos compostos
+function checkCollision(active) {
+    const env = {
+        t: parseFloat(document.getElementById("t-env").value),
+        p: parseFloat(document.getElementById("p-env").value),
+        cat: document.getElementById("c-env").value,
+        elec: document.getElementById("btn-elec").classList.contains("active"),
+        rad: document.getElementById("btn-rad").classList.contains("active")
+    };
+    document.querySelectorAll(".particle").forEach(target => {
+        if (active === target || !active.parentNode || !target.parentNode) return;
+        const r1 = active.getBoundingClientRect(); const r2 = target.getBoundingClientRect();
+        const dist = Math.hypot(r1.left - r2.left, r1.top - r2.top);
+        if (dist < 60) {
+            let f1 = parseFormula(active.dataset.formula); let f2 = parseFormula(target.dataset.formula);
+            for (let s in f2) f1[s] = (f1[s] || 0) + f2[s];
+            const result = stringifyFormula(f1);
+            const goalNorm = stringifyFormula(parseFormula(currentGoal));
+            if (result === goalNorm) {
+                if (!MISSION_LOGIC[currentGoal].check(env)) { document.getElementById("bulb").classList.add("glow"); return; }
+                document.getElementById("success-formula").innerText = currentGoal;
+                document.getElementById("congrats-modal").style.display = "block";
+            }
+            const midX = (active.offsetLeft + target.offsetLeft) / 2;
+            const midY = (active.offsetTop + target.offsetTop) / 2;
+            active.remove(); target.remove();
+            spawn(result, midX, midY);
+        }
+    });
+}
+
+function nextChallenge() {
+    document.querySelectorAll(".particle").forEach(p => p.remove());
+    document.getElementById("congrats-modal").style.display = "none";
+    document.getElementById("bulb").classList.remove("glow");
+    const keys = Object.keys(MISSION_LOGIC);
+    currentGoal = keys[Math.floor(Math.random() * keys.length)];
+    document.getElementById("goal-name").innerText = currentGoal;
+}
+// Geração do menu lateral com os elementos químicos, organizados por famílias para facilitar a navegação.
+for (let family in ELEMENTS_LIST) {
+    let div = document.createElement("div");
+    div.innerHTML = `<div class="family-name">${family}</div>`;
+    ELEMENTS_LIST[family].forEach(el => {
+        let b = document.createElement("div");
+        b.className = "element"; b.innerText = el;
+        b.onclick = () => spawn(el); div.appendChild(b);
+    });
+    document.getElementById("menu").appendChild(div);
+}
+
+// Lógica de pesquisa
+document.getElementById("search").oninput = (e) => {
+    const q = e.target.value.toUpperCase();
+    document.querySelectorAll(".element").forEach(el => { 
+        el.style.display = el.innerText.toUpperCase().includes(q) ? "inline-block" : "none"; 
+    });
+};
+
+window.onload = () => { updateEnv(); animateElectricity(); };
+</script>
+</body>
+</html>
