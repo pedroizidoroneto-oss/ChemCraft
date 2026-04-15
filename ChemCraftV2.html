@@ -233,7 +233,7 @@ const MISSION_LOGIC = {
     "H2O2": { hint: "Peróxido de Hidrogênio: H e O. Requer Pressão > 20atm.", check: (e) => e.p >= 20 },
     "NaCl": { hint: "Sal de Cozinha: Na e Cl. Reação espontânea (Temp > 25°C).", check: (e) => e.t >= 25 },
     "MgO": { hint: "Óxido de Magnésio: Mg e O. Requer Temp > 600°C (Combustão).", check: (e) => e.t >= 600 },
-    "CaO": { hint: "Cal Viva: Ca e O. Requer Temp > 800°C.", check: (e) => e.t >= 800 },
+    "CaO": { hint: "Cal Viva: Ca e O. Requer Temperatura > 800°C.", check: (e) => e.t >= 800 },
     "Fe2O3": { hint: "Ferrugem: Ferro e Oxigênio. Requer Temp > 50°C e Radiação (☢️) aceleradora.", check: (e) => e.t >= 50 && e.rad },
     "H2SO4": { hint: "Ácido Sulfúrico: H, S e O. Requer Pressão > 15atm e Platina (Pt).", check: (e) => e.p >= 15 && e.cat === "Pt" },
     "HNO3": { hint: "Ácido Nítrico: H, N e O. Requer Platina (Pt) e Temp > 200°C.", check: (e) => e.cat === "Pt" && e.t >= 200 },
