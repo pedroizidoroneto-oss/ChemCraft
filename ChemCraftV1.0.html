@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Little Lab - Reactor Edition</title>
+<title>ChemCraft - Littlebig Lab</title>
 <style>
     :root { 
-        --accent: #00ff66; /* Cor Do Site */
+        --accent: #00ff66; /* Cor Principal Do Site */
         --bg: #050505; 
         --sidebar: #0a110d; 
         --danger: #ff3c00; 
@@ -150,8 +150,28 @@ const MISSION_LOGIC = {
     "Al2O3": { hint: "Alumina: Al e O. Requer Eletricidade (⚡) e Temp > 900°C.", check: (e) => e.elec && e.t >= 900 },
     "AgCl": { hint: "Cloreto de Prata: Ag e Cl. Reage sob Radiação (☢️).", check: (e) => e.rad },
     "CO": { hint: "Monóxido de Carbono: C e O. Requer Temp > 700°C e Pressão < 1atm.", check: (e) => e.t >= 700 && e.p <= 1 },
-    "CuSO4": { hint: "Sulfato de Cobre: Cu, S e O. Requer Pressão > 10atm e Temp > 150°C.", check: (e) => e.p >= 10 && e.t >= 150 }
+    "CuSO4": { hint: "Sulfato de Cobre: Cu, S e O. Requer Pressão > 10atm e Temp > 150°C.", check: (e) => e.p >= 10 && e.t >= 150 },
+    "Na2CO3": { hint: "Carbonato de Sódio: Na, C e O. Requer Temp > 800°C.", check: (e) => e.t >= 800 },
+    "BaSO4": { hint: "Sulfato de Bário: Ba, S e O. Requer Pressão > 20atm e Radiação (☢️).", check: (e) => e.p >= 20 && e.rad },
+    "PbS": { hint: "Sulfeto de Chumbo: Pb e S. Requer Temp > 600°C.", check: (e) => e.t >= 600 },
+    "ZnO": { hint: "Óxido de Zinco: Zn e O. Requer Temp > 500°C e Eletricidade (⚡).", check: (e) => e.t >= 500 && e.elec },
+    "FeS2": { hint: "Pirita: Fe e S. Requer Temp > 400°C e Pressão > 5atm.", check: (e) => e.t >= 400 && e.p >= 5 },
+    "C3H8": { hint: "Propano: C e H. Requer Temp > 200°C e Pressão > 20atm.", check: (e) => e.t >= 200 && e.p >= 20 },
+    "C4H10": { hint: "Butano: C e H. Requer Temp > 250°C e Pressão > 25atm.", check: (e) => e.t >= 250 && e.p >= 25 },
+    "C5H12": { hint: "Pentano: C e H. Requer Temp > 300°C e Pressão > 30atm.", check: (e) => e.t >= 300 && e.p >= 30 },
+    "C6H14": { hint: "Hexano: C e H. Requer Temp > 350°C e Pressão > 35atm.", check: (e) => e.t >= 350 && e.p >= 35 },
+    "C7H16": { hint: "Heptano: C e H. Requer Temp > 400°C e Pressão > 40atm.", check: (e) => e.t >= 400 && e.p >= 40 },
+    "O2": { hint: "Oxigênio: O. Reage com quase tudo sob as condições certas. Experimente! ⚡, Temp > 100°C ou Pressão > 5atm.", check: (e) => e.elec || e.t >= 100 || e.p >= 5 },
+    "Au2O3": { hint: "Óxido de Ouro: Au e O. Requer Temp > 700°C e Eletricidade (⚡).", check: (e) => e.t >= 700 && e.elec },
+    "PtCl4": { hint: "Tetracloreto de Platina: Pt e Cl. Requer Radiação (☢️) e Temp > 300°C.", check: (e) => e.rad && e.t >= 300 },
+    "NiCO4": { hint: "Tetracarbonil de Níquel: Ni e CO. Requer Temp < 50°C e Pressão > 10atm.", check: (e) => e.t < 50 && e.p > 10 },
+    "FeCO5": { hint: "Pentacarbonil de Ferro: Fe e CO. Requer Temp < 100°C e Eletricidade (⚡).", check: (e) => e.t < 100 && e.elec },
+    "I2O5": { hint: "Pentóxido de Diiodo: I e O. Requer Temp > 400°C e Radiação (☢️).", check: (e) => e.t >= 400 && e.rad },
+    "Al2ClPu6": { hint: "Hexacloreto de Plutonio e Alumínio: Al, Pu e Cl. Requer Radiação (☢️) intensa e Temp > 500°C.", check: (e) => e.rad && e.t >= 500 },
+    "AuPt": { hint: "Aliança de Ouro e Platina: Au e Pt. Requer Eletricidade (⚡) e Pressão > 50atm.", check: (e) => e.elec && e.p > 50 },
+    "FePt3": { hint: "Ligas de Ferro e Platina: Fe e Pt. Requer Temp > 800°C e Pressão > 20atm.", check: (e) => e.t >= 800 && e.p > 20 }
 };
+
 // Variáveis globais e configuração inicial
 let currentGoal = "H2O";
 let zIndexCounter = 100;
