@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
@@ -8,41 +8,53 @@
     :root { 
         --accent: #00ff66; /* Cor Principal Dinâmica */
         --bg: #050505; 
-        --sidebar: #0a110d; 
         --danger: #ff3c00;
         --particle-shape: 50%; /* 50% = Círculo, 10% = Quadrado arredondado */
+
+        /* Paleta dinâmica do cenário baseada na cor escolhida (mantém o design original, mas adapta as cores) */
+        --sidebar: color-mix(in srgb, var(--accent) 4%, var(--bg));
+        --bg-tools: color-mix(in srgb, var(--accent) 3%, var(--bg));
+        --bg-darker: color-mix(in srgb, var(--accent) 8%, var(--bg));
+        --bg-element: color-mix(in srgb, var(--accent) 10%, var(--bg));
+        --bg-molecule: color-mix(in srgb, var(--accent) 15%, var(--bg));
+        --border-main: color-mix(in srgb, var(--accent) 20%, var(--bg));
+        --text-muted: color-mix(in srgb, var(--accent) 40%, #888);
+        
+        --accent-10: color-mix(in srgb, var(--accent) 10%, transparent);
+        --accent-02: color-mix(in srgb, var(--accent) 2%, transparent);
+        --accent-20: color-mix(in srgb, var(--accent) 20%, transparent);
     }
     body { margin:0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #eee; display:flex; height:100vh; overflow:hidden; user-select: none; }
     
     /* Layout Base */
-    #sidebar { width:320px; background: var(--sidebar); border-right:1px solid #1a3324; display:flex; flex-direction:column; z-index:100; }
-    #search-box { padding:15px; background: #0d1a12; border-bottom: 1px solid #1a3324; display: flex; gap: 5px;}
-    #search { flex: 1; padding:10px; border-radius:6px; border:1px solid #1a3324; background:#050505; color:white; outline:none; }
+    #sidebar { width:320px; background: var(--sidebar); border-right:1px solid var(--border-main); display:flex; flex-direction:column; z-index:100; }
+    #search-box { padding:15px; background: var(--bg-darker); border-bottom: 1px solid var(--border-main); display: flex; gap: 5px;}
+    #search { flex: 1; padding:10px; border-radius:6px; border:1px solid var(--border-main); background:var(--bg); color:white; outline:none; }
     
     .scroll-area { flex:1; overflow-y:auto; padding:15px; scrollbar-width: thin; }
-    .family-name { font-size:10px; color: #4a7a5d; text-transform:uppercase; letter-spacing:1px; margin:15px 0 5px; font-weight:bold; }
-    .element { background:#0a1510; padding:6px; margin:2px; display:inline-block; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold; min-width:35px; text-align:center; border:1px solid #1a3324; transition: 0.1s; }
+    .family-name { font-size:10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin:15px 0 5px; font-weight:bold; }
+    .element { background:var(--bg-element); padding:6px; margin:2px; display:inline-block; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold; min-width:35px; text-align:center; border:1px solid var(--border-main); transition: 0.1s; }
     .element:hover { border-color: var(--accent); color: var(--accent); }
 
     /* Ferramentas */
-    #tools { padding:15px; background:#080d0a; border-top:1px solid #1a3324; }
+    #tools { padding:15px; background:var(--bg-tools); border-top:1px solid var(--border-main); }
     .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom:8px; }
-    label { font-size:9px; color:#4a7a5d; display:block; margin-bottom:2px; }
-    input, select { width:100%; padding:5px; background:#050505; border:1px solid #1a3324; color:var(--accent); border-radius:4px; font-size:11px; outline: none;}
-    .btn-toggle { flex:1; padding:10px; border:1px solid #1a3324; border-radius:4px; cursor:pointer; background:#050505; color:#333; font-size:14px; transition: 0.2s; }
-    .btn-toggle.active { color: var(--accent); border-color: var(--accent); background: rgba(0,255,102,0.1); }
+    label { font-size:9px; color:var(--text-muted); display:block; margin-bottom:2px; }
+    input, select { width:100%; padding:5px; background:var(--bg); border:1px solid var(--border-main); color:var(--accent); border-radius:4px; font-size:11px; outline: none;}
+    .btn-toggle { flex:1; padding:10px; border:1px solid var(--border-main); border-radius:4px; cursor:pointer; background:var(--bg); color:#333; font-size:14px; transition: 0.2s; }
+    .btn-toggle.active { color: var(--accent); border-color: var(--accent); background: var(--accent-10); }
 
     /* Área de Trabalho */
-    #workspace { flex:1; position:relative; overflow:hidden; background:#050505; display:flex; flex-direction: column;}
+    #workspace { flex:1; position:relative; overflow:hidden; background:var(--bg); display:flex; flex-direction: column;}
     
     /* Top Bar: Pontuação e Opções */
-    #top-bar { padding: 15px 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid #1a3324; display: flex; justify-content: space-between; align-items: center; z-index: 20; position: relative;}
+    #top-bar { padding: 15px 20px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--border-main); display: flex; justify-content: space-between; align-items: center; z-index: 20; position: relative;}
     .stats { display: flex; gap: 20px; font-size: 14px; font-weight: bold; }
-    .stat-box { background: #0a1510; border: 1px solid var(--accent); padding: 5px 15px; border-radius: 20px; color: var(--accent); }
-    .top-btns button { background: #0a1510; border: 1px solid #1a3324; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s; margin-left: 5px; }
+    .stat-box { background: var(--bg-element); border: 1px solid var(--accent); padding: 5px 15px; border-radius: 20px; color: var(--accent); }
+    .top-btns button { background: var(--bg-element); border: 1px solid var(--border-main); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s; margin-left: 5px; }
     .top-btns button:hover { border-color: var(--accent); color: var(--accent); }
 
-    #press-box { position: absolute; inset: 60px 20px 20px 20px; border: 4px solid rgba(0, 255, 102, 0.1); background: rgba(0, 255, 102, 0.02); border-radius: 10px; pointer-events: none; z-index: 1; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); transform-origin: center center; }
+    #press-box { position: absolute; inset: 60px 20px 20px 20px; border: 4px solid var(--accent-10); background: var(--accent-02); border-radius: 10px; pointer-events: none; z-index: 1; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); transform-origin: center center; }
     #temp-layer, #rad-layer { position:absolute; inset:0; pointer-events:none; z-index:2; transition: background-color 0.5s; }
     #elec-canvas { position:absolute; top:0; left:0; pointer-events:none; z-index:3; }
 
@@ -51,14 +63,23 @@
     #catalyst-display { position:absolute; bottom:20px; left:20px; background:rgba(0,0,0,0.8); padding:10px 15px; border-radius:8px; border-left:4px solid var(--accent); color:white; font-weight:bold; z-index:20; display:none; }
     #warning-ui { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:var(--danger); color:white; padding:8px 20px; border-radius:20px; font-weight:bold; display:none; z-index:200; }
 
+    /* Janela de Imagem do Objetivo */
+    #mission-preview { 
+        position: absolute; top: 80px; right: 80px; width: 150px; height: 150px; 
+        background: var(--bg-element); border: 2px solid var(--accent); border-radius: 12px; 
+        overflow: hidden; z-index: 90; box-shadow: 0 0 15px var(--accent-20);
+    }
+    #mission-preview img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s; }
+    #mission-preview:hover img { opacity: 1; }
+
     /* Dicas */
-    #bulb { position:absolute; top:80px; right:20px; width:45px; height:45px; background:#0a1510; border:1px solid #1a3324; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:100; font-size: 20px; padding:0; line-height:1; }
+    #bulb { position:absolute; top:80px; right:20px; width:45px; height:45px; background:var(--bg-element); border:1px solid var(--border-main); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:100; font-size: 20px; padding:0; line-height:1; }
     #bulb.glow { background: var(--accent); box-shadow: 0 0 25px var(--accent); color:#000; }
-    #hint-box { position:absolute; top:135px; right:20px; width:220px; background:rgba(5,10,7,0.95); padding:15px; border-radius:8px; border:1px solid #1a3324; display:none; z-index:100; font-size:12px; backdrop-filter: blur(5px); color: #ccc; }
+    #hint-box { position:absolute; top:135px; right:20px; width:220px; background:color-mix(in srgb, var(--accent) 5%, rgba(0,0,0,0.95)); padding:15px; border-radius:8px; border:1px solid var(--border-main); display:none; z-index:100; font-size:12px; backdrop-filter: blur(5px); color: #ccc; }
     
     /* Modais */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-    .modal-content { background: #050505; border: 2px solid var(--accent); padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 0 30px rgba(0,255,102,0.2); max-width: 400px; width: 90%; }
+    .modal-content { background: var(--bg); border: 2px solid var(--accent); padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 0 30px var(--accent-20); max-width: 400px; width: 90%; }
     .modal-content h2 { color: var(--accent); margin-top: 0; }
     .btn-primary { background: var(--accent); border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 15px; color: #000; transition: 0.2s;}
     .btn-primary:hover { opacity: 0.8; transform: scale(1.05); }
@@ -66,12 +87,12 @@
 
     /* Partículas */
     .particle { 
-        position:absolute; min-width:50px; height:50px; border-radius: var(--particle-shape); background:#0a1510; border:2px solid #1a3324;
+        position:absolute; min-width:50px; height:50px; border-radius: var(--particle-shape); background:var(--bg-element); border:2px solid var(--border-main);
         display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:move; z-index:50;
         transform: translate(-50%, -50%); transition: transform 0.1s, border-color 0.2s, border-radius 0.3s;
     }
     .particle.dragging { transform: translate(-50%, -50%) scale(1.15); border-color: var(--accent); z-index: 1000; } 
-    .molecule { border-radius: 12px; padding: 0 12px; border-color: var(--accent); background: #051a0f; }
+    .molecule { border-radius: 12px; padding: 0 12px; border-color: var(--accent); background: var(--bg-molecule); }
     .electrified { animation: tremble 0.1s infinite; border-color: var(--accent); box-shadow: 0 0 10px var(--accent); }
     
     /* Tutorial Overlay */
@@ -82,7 +103,7 @@
     /* Customization Settings */
     .setting-group { margin-bottom: 20px; text-align: left; }
     .setting-group label { font-size: 12px; color: white; }
-    .setting-options { display: flex; gap: 10px; margin-top: 5px; justify-content: center; }
+    .setting-options { display: flex; gap: 10px; margin-top: 5px; justify-content: center; flex-wrap: wrap; }
     .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
     .shape-swatch { width: 30px; height: 30px; background: #222; cursor: pointer; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; }
 
@@ -143,6 +164,12 @@
         <div style="font-size: 10px; color: #aaa;" id="mission-type">OBJETIVO:</div>
         <strong id="goal-name" style="font-size:22px; color:var(--accent);">H2O</strong>
     </div>
+
+    <!-- Nova Janela de Preview Visual -->
+    <div id="mission-preview">
+        <img id="goal-image" src="" alt="Objetivo">
+    </div>
+
     <div id="catalyst-display">Catalisador: Nenhum</div>
     <div id="warning-ui">⚠️ TERMÓLISE ATIVA (>1000°C)</div>
     
@@ -169,6 +196,11 @@
                     <div class="color-swatch" style="background: #00d0ff;" onclick="setTheme('#00d0ff')"></div>
                     <div class="color-swatch" style="background: #ff0055;" onclick="setTheme('#ff0055')"></div>
                     <div class="color-swatch" style="background: #ffd700;" onclick="setTheme('#ffd700')"></div>
+                    <div class="color-swatch" style="background: #9d00ff;" onclick="setTheme('#9d00ff')"></div>
+                    <div class="color-swatch" style="background: #ff8800;" onclick="setTheme('#ff8800')"></div>
+                    <div class="color-swatch" style="background: #ffffff;" onclick="setTheme('#ffffff')"></div>
+                    <div class="color-swatch" style="background: #ff66cc;" onclick="setTheme('#ff66cc')"></div>
+                    <div class="color-swatch" style="background: #0022ff;" onclick="setTheme('#0022ff')"></div>
                 </div>
             </div>
 
@@ -219,43 +251,43 @@ const ELEMENTS_LIST = {
     "Actinídeos": ["Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"]
 };
 
-// Missões com correção de sintaxe das últimas linhas
+// Missões
 const MISSION_LOGIC = {
     "H2O": { 
-        img: "https://images.unsplash.com/photo-1527066236128-2ff79f7b9705?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8JUMzJTgxZ3VhfGVufDB8fDB8fHww",
-        hint: "Água: Oxigénio e Hidrogénio. Use ⚡ ou Temp > 100°C.", 
-        check: (e) => e.elec || e.t >= 100 // Confirma se o usuário realmente ativou um dos fatores necessários para a reação, caso contrário, acende a lâmpada de dica. (|| significa "ou")
+        img: "https://images.unsplash.com/photo-1527066236128-2ff79f7b9705?w=500",
+        hint: "Água: Oxigênio e Hidrogênio. Use ⚡ ou Temp > 100°C.", 
+        check: (e) => e.elec || e.t >= 100 
     },
     "CO2": { 
-        img: "https://images.unsplash.com/photo-1701970947932-d5f730c3c1cb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Y2FyYm9uJTIwZGlveGlkZXxlbnwwfHwwfHx8MA%3D%3D", 
+        img: "https://images.unsplash.com/photo-1701970947932-d5f730c3c1cb?w=500", 
         hint: "Dióxido de Carbono: Combustão de C. Requer Temp > 250°C.", 
         check: (e) => e.t >= 250 
     },
     "NH3": {
-        img: "https://www.ecochem.co.nz/wp-content/uploads/2017/09/Ammonia-20L-300x406.jpg",
-        hint: "Amónia: N e H. Requer Pressão > 10atm e Catalisador de Ferro (Fe).",
-        check: (e) => e.p >= 10 && e.cat === "Fe" },
+        img: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=500",
+        hint: "Amônia: N e H. Requer Pressão > 10atm e Catalisador de Ferro (Fe).",
+        check: (e) => e.p >= 10 && e.cat === "Fe" 
+    },
     "HCl": {
-        img: "https://thumbs.dreamstime.com/b/%C3%A1cido-clor%C3%ADdrico-hcl-l%C3%ADquido-altamente-corrosivo-usado-como-solvente-e-na-produ%C3%A7%C3%A3o-de-v%C3%A1rios-produtos-qu%C3%ADmicos-277841120.jpg?w=992",
+        img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500",
         hint: "Ácido Clorídrico: H e Cl. Requer Temp > 200°C ou Catalisador de Platina (Pt).",
         check: (e) => e.t >= 200 || e.cat === "Pt" 
     },
     "CH4": {
-        img: "https://images.unsplash.com/photo-1737385297545-2a8deb054525?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8bWV0YW5vfGVufDB8fDB8fHww",
+        img: "https://images.unsplash.com/photo-1737385297545-2a8deb054525?w=500",
         hint: "Metano: C e H. Requer Pressão > 5atm e Temp > 150°C.",
         check: (e) => e.p > 5 && e.t > 150 
     },
     "NaCl": {
-        img: "https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U2FsdHxlbnwwfHwwfHx8MA%3D%3D",
+        img: "https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?w=500",
         hint: "Sal: Sódio + Cloro.",
         check: (e) => e.t >= 25
     },
     "Fe2O3": {
-        img: "https://images.unsplash.com/photo-1581091870620-8c9b1a7e5c8b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Rmlybw%3D%3D",
+        img: "https://images.unsplash.com/photo-1581091870620-8c9b1a7e5c8b?w=500",
         hint: "Ferrugem: Ferro e Oxigênio. Requer Temp > 50°C e Radiação (☢️) aceleradora.",
         check: (e) => e.t >= 50 && e.rad
     },
-
 };
 
 let currentGoal = "H2O";
@@ -408,7 +440,7 @@ function addExperience(formula) {
     if (xp >= xpNeeded) {
         level++;
         xp -= xpNeeded;
-        xpNeeded = Math.floor(xpNeeded * 1.5); // Escala a dificuldade
+        xpNeeded = Math.floor(xpNeeded * 1.5);
         setTimeout(() => alert(`🎉 Nível ${level} Alcançado!`), 500);
     }
     
@@ -453,6 +485,11 @@ function checkCollision(active) {
     });
 }
 
+function updateGoalDisplay() {
+    document.getElementById("goal-name").innerText = currentGoal;
+    document.getElementById("goal-image").src = MISSION_LOGIC[currentGoal].img;
+}
+
 function nextChallenge() {
     document.querySelectorAll(".particle").forEach(p => p.remove());
     document.getElementById("congrats-modal").style.display = "none";
@@ -463,13 +500,11 @@ function nextChallenge() {
     
     const keys = Object.keys(MISSION_LOGIC);
     currentGoal = keys[Math.floor(Math.random() * keys.length)];
-    document.getElementById("goal-name").innerText = currentGoal;
+    updateGoalDisplay();
 }
 
-// Desafio Diário
 function loadDailyChallenge() {
     const date = new Date();
-    // Seed simples baseada no dia para pegar sempre o mesmo composto
     const seed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
     const keys = Object.keys(MISSION_LOGIC);
     const index = seed % keys.length;
@@ -478,17 +513,15 @@ function loadDailyChallenge() {
     isDailyChallenge = true;
     
     document.getElementById("mission-type").innerText = "DESAFIO DIÁRIO (" + date.toLocaleDateString() + "):";
-    document.getElementById("goal-name").innerText = currentGoal;
+    updateGoalDisplay();
     document.querySelectorAll(".particle").forEach(p => p.remove());
 }
 
-// Personalização
 function openSettings() { document.getElementById("settings-modal").style.display = "flex"; }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 function setTheme(color) { document.documentElement.style.setProperty('--accent', color); }
 function setShape(radius) { document.documentElement.style.setProperty('--particle-shape', radius); }
 
-// Tutorial
 function startTutorial() {
     document.getElementById("tutorial-overlay").style.display = "block";
     nextTut(1);
@@ -500,7 +533,7 @@ function nextTut(step) {
     if(step === 0) document.getElementById("tutorial-overlay").style.display = "none";
 }
 
-// Inicialização do Menu
+// Menu Elements Initialization
 for (let family in ELEMENTS_LIST) {
     let div = document.createElement("div");
     div.innerHTML = `<div class="family-name">${family}</div>`;
@@ -519,7 +552,11 @@ document.getElementById("search").oninput = (e) => {
     });
 };
 
-window.onload = () => { updateEnv(); animateElectricity(); };
+window.onload = () => { 
+    updateEnv(); 
+    animateElectricity(); 
+    updateGoalDisplay();
+};
 </script>
 </body>
 </html>
