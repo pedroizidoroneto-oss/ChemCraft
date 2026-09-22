@@ -259,32 +259,32 @@ const MISSION_LOGIC = {
         check: (e) => e.elec || e.t >= 100 
     },
     "CO2": { 
-        img: "https://images.unsplash.com/photo-1701970947932-d5f730c3c1cb?w=500", 
+        img: "Imagens/CO2.webp", 
         hint: "Dióxido de Carbono: Combustão de C. Requer Temp > 250°C.", 
         check: (e) => e.t >= 250 
     },
     "NH3": {
-        img: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=500",
+        img: "Imagens/NH3.webp",
         hint: "Amônia: N e H. Requer Pressão > 10atm e Catalisador de Ferro (Fe).",
         check: (e) => e.p >= 10 && e.cat === "Fe" 
     },
     "HCl": {
-        img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500",
+        img: "Imagens/HCl.webp",
         hint: "Ácido Clorídrico: H e Cl. Requer Temp > 200°C ou Catalisador de Platina (Pt).",
         check: (e) => e.t >= 200 || e.cat === "Pt" 
     },
     "CH4": {
-        img: "https://images.unsplash.com/photo-1737385297545-2a8deb054525?w=500",
+        img: "Imagens/CH4.webp",
         hint: "Metano: C e H. Requer Pressão > 5atm e Temp > 150°C.",
         check: (e) => e.p > 5 && e.t > 150 
     },
     "NaCl": {
-        img: "https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?w=500",
+        img: "Imagens/NaCl.webp",
         hint: "Sal: Sódio + Cloro.",
         check: (e) => e.t >= 25
     },
     "Fe2O3": {
-        img: "https://images.unsplash.com/photo-1581091870620-8c9b1a7e5c8b?w=500",
+        img: "Imagens/Fe2O3.webp",
         hint: "Ferrugem: Ferro e Oxigênio. Requer Temp > 50°C e Radiação (☢️) aceleradora.",
         check: (e) => e.t >= 50 && e.rad
     },
